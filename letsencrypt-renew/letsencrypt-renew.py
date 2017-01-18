@@ -6,7 +6,7 @@ from sys import exit
 from bs4 import BeautifulSoup
 
 from os import path, environ
-from subprocess import check_output
+from subprocess import check_output, STDOUT, CalledProcessError
 
 from OpenSSL import crypto
 import smtplib
@@ -53,10 +53,18 @@ def renewcert(domain,domtag):
     sumtag.append('.')
   domtag.insert(len(domtag),newtag('h3','Renewing Certificate'))
   domtag.insert(len(domtag),newtag('pre',' '.join(cmd)))
-  print(' '.join(cmd))
-  out = check_output(cmd)
-  print(out)
-  domtag.insert(len(domtag),newtag('pre',' '.join(out)))
+  cmd.append('--verbose')
+  try:
+    out = check_output(cmd, stderr=STDOUT)
+    out = out.decode("utf-8")
+  except CalledProcessError as e:
+    print(e)
+    out = e.output.decode("utf-8")
+    logger.error(out)
+    domtag.insert(len(domtag),newtag('pre',out ))
+    return
+  logger.debug(out)
+  domtag.insert(len(domtag),newtag('pre',out ))
 
   with open(path.join(basepath,domain,'cert.pem')) as certf, \
        open(path.join(basepath,domain,'privkey.pem')) as keyf, \
