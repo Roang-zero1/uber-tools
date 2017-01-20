@@ -4,19 +4,24 @@ import logging.config
 from sys import exit
 
 from os import path, environ
-from subprocess import check_output, STDOUT, CalledProcessError
+
+from runhelper import runcmd
+from subprocess import CalledProcessError
 
 from OpenSSL import crypto
 from datetime import datetime, timedelta
 
+config = {}
+basepath = ""
+logger = logging.getLogger(__name__)
 
 def loadconfig():
   logger.info('Loading configuration')
   try:
     with open("config.json", encoding="utf-8") as fd:
       config = json.load(fd)
-  except (FileNotFoundError, ValueError):
-    logger.error("Logging configuration could not be read")
+  except (FileNotFoundError, ValueError) as e:
+    logger.error("Logging configuration could not be read:\n{}".format(e))
     exit(1)
   return config
 
@@ -31,17 +36,17 @@ def renewcert(domain):
       for alternate in domainc['alternates']:
         cmd.append(' -d {0}'.format(alternate))
   
-  cmd.append('--verbose')
   try:
-    out = check_output(cmd, stderr=STDOUT)
-    out = out.decode("utf-8")
+    output = runcmd(cmd)
+    logger.info('Certificate renewal successful')
   except CalledProcessError as e:
-    print(e)
-    out = e.output.decode("utf-8")
-    logger.error(out)
-    return
-  logger.debug(out)
+    output = e.output
+    logger.error('Certificate renewal failed.\n{}'.format(output.err))
+    return  
+  if output.err:
+    logger.debug(output.err)
 
+  
   with open(path.join(basepath,domain,'cert.pem')) as certf, \
        open(path.join(basepath,domain,'privkey.pem')) as keyf, \
        open(path.join(basepath,domain,'fullchain.pem')) as chainf, \
@@ -55,11 +60,8 @@ def renewcert(domain):
   cmd.append(' -k {0}'.format(path.join(basepath,domain,'privkey.pem')))
   cmd.append(' -c {0}'.format(path.join(basepath,domain,'cert.pem')))
 
-
-
 def main():
   logger.info('Iniating certification renewal check')
-  loadconfig()
   reneweddoms = 0
 
   for domain in config['domains']:
@@ -76,8 +78,6 @@ def main():
       renewcert(domain)
     else:
       logger.debug('Domain {0} will not be renewed'.format(domain))
-
-
 
 if __name__ == "__main__":
   logging.basicConfig(level="INFO")
