@@ -38,9 +38,9 @@ def runcmd(*popenargs, **kwargs):
     process = Popen(stdout=PIPE, stderr=PIPE, *popenargs, **kwargs)
     std_out, std_err = process.communicate()
     retcode = process.poll()
-    
+
     output = CmdOutput(std_out.decode("utf-8"),std_err.decode("utf-8"),retcode)
-    
+
     if retcode:
         raise CalledProcessError(retcode, cmd, output=output)
     return output
