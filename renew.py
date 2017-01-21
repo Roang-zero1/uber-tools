@@ -1,7 +1,6 @@
-import json
 import logging
-import logging.config
 import tools.logging
+import tools.configuration
 
 from os import path, environ
 from datetime import datetime, timedelta
@@ -10,15 +9,7 @@ from OpenSSL import crypto
 
 import tools.le.cert as letools
 
-def loadconfig():
-  logger.info('Loading configuration')
-  try:
-    with open("config.json", encoding="utf-8") as fd:
-      config = json.load(fd)
-  except (FileNotFoundError, ValueError) as e:
-    logger.error("Logging configuration could not be read:\n{}".format(e))
-    exit(1)
-  return config
+logger = logging.getLogger(__name__)
 
 def main():
   logger.info('Iniating certification renewal check')
@@ -43,9 +34,8 @@ def main():
 
 if __name__ == "__main__":
   tools.logging.setup_logging()
-  logger = logging.getLogger(__name__)
 
-  config = loadconfig()
+  config = tools.configuration.loadconfig()
   basepath = basepath = config['general'].get("basepath",path.join(environ['HOME'],'.config/letsencrypt/live/'))
   letools.configure(config)
 

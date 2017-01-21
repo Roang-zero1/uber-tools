@@ -53,6 +53,7 @@ def renewcert(domain):
   if output.err:
     logger.debug(output.err)
 
+  logger.info("Creating a full certificate file")
   with open(path.join(basepath,domain,'cert.pem')) as certf, \
        open(path.join(basepath,domain,'privkey.pem')) as keyf, \
        open(path.join(basepath,domain,'fullchain.pem')) as chainf, \
@@ -62,6 +63,7 @@ def renewcert(domain):
     chain = chainf.read()
     fullf.write(key+ cert + chain)
 
+  logger.info("Add certificate to webserver")
   cmd = ['uberspace-add-certificate']
   cmd.append(' -k {0}'.format(path.join(basepath,domain,'privkey.pem')))
   cmd.append(' -c {0}'.format(path.join(basepath,domain,'cert.pem')))
