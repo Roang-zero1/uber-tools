@@ -2,10 +2,12 @@ import logging
 
 from os import path, environ, listdir
 from collections import namedtuple
-from datetime import datetime, timedelta
-from OpenSSL import crypto
 from tools.wrapper.runhelper import runcmd
 from subprocess import CalledProcessError
+
+from cryptography import x509
+from cryptography.hazmat.backends import default_backend
+from cryptography.x509.oid import ExtensionOID
 
 config = {}
 basepath = ""
@@ -14,20 +16,20 @@ logger = logging.getLogger(__name__)
 domainInfo = namedtuple('DomainInfo', 'domain, valid_until, alternates')
 
 def configure(configuration):
-    global config, basepath
+  global config, basepath
 
-    config = configuration
-    basepath = basepath = config['general'].get("basepath",path.join(environ['HOME'],'.config/letsencrypt/live/'))
+  config = configuration
+  basepath = basepath = config['general'].get("basepath",path.join(environ['HOME'],'.config/letsencrypt/live/'))
 
 def getcertinfo():
-  domains = []
+  domains = {}
   dirs = listdir(basepath)
   for directory in dirs:
-    with open(path.join(basepath,directory,'cert.pem'), 'rt') as file:
-      cert = crypto.load_certificate(crypto.FILETYPE_PEM, file.read())
-    print(cert.get_subject())
-    print(cert.get_extension(6).get_short_name())
-    certdate = datetime.strptime(cert.get_notAfter().decode('utf-8'), '%Y%m%d%H%M%SZ')
+    with open(path.join(basepath,directory,'cert.pem'), 'rb') as file:
+      content = file.read()
+    cert = x509.load_pem_x509_certificate(content, default_backend())
+    alternates=cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value
+    domains[directory] = domainInfo(cert.subject,cert.not_valid_after,alternates)
   return domains
 
 def renewcert(domain):
@@ -37,9 +39,9 @@ def renewcert(domain):
   if config['general'].get('test',False): testing = '--staging'
   cmd = ['letsencrypt','certonly',testing,'-d {0}'.format(domain)]
   if 'alternates' in domainc:
-      logger.debug('Renewing for alternate names {0}'.format(", ".join(domainc['alternates'])))
-      for alternate in domainc['alternates']:
-        cmd.append(' -d {0}'.format(alternate))
+    logger.debug('Renewing for alternate names {0}'.format(", ".join(domainc['alternates'])))
+    for alternate in domainc['alternates']:
+      cmd.append(' -d {0}'.format(alternate))
 
   try:
     output = runcmd(cmd)
