@@ -21,15 +21,18 @@ def configure(configuration):
   config = configuration
   basepath = basepath = config['general'].get("basepath",path.join(environ['HOME'],'.config/letsencrypt/live/'))
 
-def getcertinfo():
+def getcertinfo(directory):
+  with open(path.join(basepath,directory,'cert.pem'), 'rb') as file:
+    content = file.read()
+  cert = x509.load_pem_x509_certificate(content, default_backend())
+  alternates=cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value
+  return domainInfo(cert.subject,cert.not_valid_after,alternates)
+
+def getallcertinfo():
   domains = {}
   dirs = listdir(basepath)
   for directory in dirs:
-    with open(path.join(basepath,directory,'cert.pem'), 'rb') as file:
-      content = file.read()
-    cert = x509.load_pem_x509_certificate(content, default_backend())
-    alternates=cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME).value
-    domains[directory] = domainInfo(cert.subject,cert.not_valid_after,alternates)
+    domains[directory] = getcertinfo(directory)
   return domains
 
 def renewcert(domain):

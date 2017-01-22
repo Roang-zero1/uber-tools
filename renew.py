@@ -15,18 +15,19 @@ def main():
   logger.info('Iniating certification renewal check')
   reneweddoms = 0
 
-  domains = letools.getcertinfo()
+  domains = letools.getallcertinfo()
 
   for domain in config['domains']:
     logger.info('Verifying domain {0}'.format(domain))
-    try:
-      with open(path.join(basepath,domain,'cert.pem'), 'rt') as file:
-        cert = crypto.load_certificate(crypto.FILETYPE_PEM, file.read())
-      certdate = datetime.strptime(cert.get_notAfter().decode('utf-8'), '%Y%m%d%H%M%SZ')
-      validtime = certdate - datetime.utcnow()
-    except FileNotFoundError as ex:
-      validtime = timedelta(0)
-    if validtime < timedelta(days=config['general'].get('limit',15)):
+    renew = False
+    if domain in domains:
+      validtime = domains[domain].valid_until  - datetime.utcnow()
+      if validtime < timedelta(days=config['general'].get('limit',15)):
+        renew = True
+    else:
+      renew = True
+
+    if renew:
       reneweddoms += 1
       letools.renewcert(domain)
     else:
