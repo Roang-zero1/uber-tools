@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tools.wrapper package &#8212; uber-tools 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="tools.le package" href="tools.le.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.le.html" title="tools.le package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">uber-tools 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >uber-tools</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="tools.html" accesskey="U">tools package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="tools-wrapper-package">
+<h1>tools.wrapper package<a class="headerlink" href="#tools-wrapper-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tools.wrapper.runhelper">
+<span id="tools-wrapper-runhelper-module"></span><h2>tools.wrapper.runhelper module<a class="headerlink" href="#module-tools.wrapper.runhelper" title="Permalink to this headline">¶</a></h2>
+<p>Custom wrapper for the Popen construct</p>
+<dl class="class">
+<dt id="tools.wrapper.runhelper.CmdOutput">
+<em class="property">class </em><code class="descclassname">tools.wrapper.runhelper.</code><code class="descname">CmdOutput</code><span class="sig-paren">(</span><em>out</em>, <em>err</em>, <em>retcode</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<dl class="attribute">
+<dt id="tools.wrapper.runhelper.CmdOutput.err">
+<code class="descname">err</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tools.wrapper.runhelper.CmdOutput.out">
+<code class="descname">out</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tools.wrapper.runhelper.CmdOutput.retcode">
+<code class="descname">retcode</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.retcode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tools.wrapper.runhelper.runcmd">
+<code class="descclassname">tools.wrapper.runhelper.</code><code class="descname">runcmd</code><span class="sig-paren">(</span><em>*popenargs</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/tools/wrapper/runhelper.html#runcmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tools.wrapper.runhelper.runcmd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run command with arguments and return the std_out, std,err and
+returncode as a namedtuple.</p>
+<p>If the exit code was non-zero it raises a CalledProcessError.  The
+CalledProcessError object will have the return code in the returncode
+attribute and output in the output attribute.</p>
+<p>The arguments are the same as for the Popen constructor.
+The stdout and stderr argument is not allowed as they are used internally.</p>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">runcmd</span><span class="p">([</span><span class="s2">&quot;ls&quot;</span><span class="p">,</span> <span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;/dev/null&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tools.wrapper">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-tools.wrapper" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tools.wrapper package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-tools.wrapper.runhelper">tools.wrapper.runhelper module</a></li>
+<li><a class="reference internal" href="#module-tools.wrapper">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tools.le.html"
+                        title="previous chapter">tools.le package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/source/tools.wrapper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.le.html" title="tools.le package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">uber-tools 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >uber-tools</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="tools.html" >tools package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Brandstaetter.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>
