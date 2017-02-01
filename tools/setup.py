@@ -33,6 +33,7 @@ def setup_logging(
     logging.config.dictConfig(config)
   else:
     logging.basicConfig(level=default_level)
+  logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 def loadconfig(
     default_path='config.json',
