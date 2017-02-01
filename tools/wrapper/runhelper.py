@@ -1,5 +1,5 @@
 """
-Custom wrapper for the Popen construct
+Custom wrapper for the :func:`subprocess.Popen` function
 """
 import logging
 
@@ -7,6 +7,10 @@ from collections import namedtuple
 from subprocess import Popen, PIPE, CalledProcessError
 
 CmdOutput = namedtuple('CmdOutput', 'out, err, retcode')
+"""
+The command stdout and stderr buffer content and the returncode.
+
+"""
 logger = logging.getLogger(__name__)
 
 def runcmd(*popenargs, **kwargs):
@@ -19,6 +23,13 @@ def runcmd(*popenargs, **kwargs):
 
   The arguments are the same as for the Popen constructor.
   The stdout and stderr argument is not allowed as they are used internally.
+
+  Args:
+    *args: Variable length argument list.
+    **kwargs: Arbitrary keyword arguments.
+
+  Returns:
+    CmdOutput: The output created by the executed command.
 
   Example:
     >>> runcmd(["ls", "-l", "/dev/null"])
