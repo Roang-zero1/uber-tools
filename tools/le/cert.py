@@ -10,11 +10,12 @@ import sys
 from collections import namedtuple
 from os import environ, listdir, path
 from subprocess import CalledProcessError
-from tools.wrapper.runhelper import runcmd
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.x509.oid import ExtensionOID
+
+from tools.wrapper.runhelper import runcmd
 
 this = sys.modules[__name__]
 this.config = {}

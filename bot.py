@@ -2,8 +2,7 @@
 
 import logging
 import sys
-
-from pprint import pprint, pformat
+from pprint import pprint
 from time import sleep
 
 import telepot

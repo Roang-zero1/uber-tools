@@ -2,9 +2,8 @@
 Custom wrapper for the :func:`subprocess.Popen` function
 """
 import logging
-
 from collections import namedtuple
-from subprocess import Popen, PIPE, CalledProcessError
+from subprocess import PIPE, CalledProcessError, Popen
 
 CmdOutput = namedtuple('CmdOutput', 'out, err, retcode')
 """
