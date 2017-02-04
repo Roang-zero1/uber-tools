@@ -14,6 +14,33 @@ import tools.setup
 logger = logging.getLogger(__name__)
 this = sys.modules[__name__]
 
+from app.base import Base
+
+
+class Bot(Base):
+  """The telegram Bot"""
+
+  def run(self):
+    tools.setup.setup_logging()
+
+    this.config = tools.setup.loadconfig()
+    letools.configure(this.config)
+
+    if 'bot' in this.config:
+      if 'key' in this.config['bot']:
+        logger.info("Initializing the bot")
+        this.bot = telepot.Bot(this.config['bot']['key'])
+        if logger.isEnabledFor(logging.DEBUG):
+          botdata = this.bot.getMe()
+          logger.debug("Bot with id %d and name %s connected", botdata['id'], botdata['first_name'])
+      else:
+        logger.error("Bot configuration not found")
+        exit(2)
+    else:
+      logger.error("Bot configuration not found")
+      exit(2)
+
+    main()
 
 def listcerts(msg):
   cid = msg['chat']['id']
@@ -26,13 +53,13 @@ def listcerts(msg):
       output += "  • Alternates:\n"
       for alternate in domaininfo.alternates:
         output += "    • {}\n".format(alternate.value)
-  bot.sendMessage(cid, output)
+  this.bot.sendMessage(cid, output)
   pprint(msg)
 
 
 def nothing(msg):
   cid = msg['chat']['id']
-  bot.sendMessage(cid, 'Please use command interface!')
+  this.bot.sendMessage(cid, 'Please use command interface!')
 
 
 def handle(msg):
@@ -42,28 +69,9 @@ def handle(msg):
 
 
 def main():
-  bot.message_loop(handle)
+  this.bot.message_loop(handle)
   while True:
     sleep(100000000)
 
 if __name__ == "__main__":
-  tools.setup.setup_logging()
-
-  this.config = tools.setup.loadconfig()
-  letools.configure(this.config)
-
-  if 'bot' in this.config:
-    if 'key' in this.config['bot']:
-      logger.info("Initializing the bot")
-      bot = telepot.Bot(this.config['bot']['key'])
-      if logger.isEnabledFor(logging.DEBUG):
-        botdata = bot.getMe()
-        logger.debug("Bot with id %d and name %s connected", botdata['id'], botdata['first_name'])
-    else:
-      logger.error("Bot configuration not found")
-      exit(2)
-  else:
-    logger.error("Bot configuration not found")
-    exit(2)
-
-  main()
+  pass
