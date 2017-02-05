@@ -18,7 +18,6 @@ Help:
     https://github.com/Roang-zero1/uber-tools
 """
 import logging
-import sys
 from pprint import pprint
 from time import sleep
 
@@ -27,26 +26,23 @@ import telepot.routing
 
 import app.tools.cert as letools
 from app.base import Base
-from app.tools import setup
 
 logger = logging.getLogger(__name__)
-this = sys.modules[__name__]
 
 class Bot(Base):
   """The telegram Bot"""
 
+  bot = None
+
   def execute(self):
-    setup.setup_logging()
+    letools.configure(self.config)
 
-    this.config = setup.loadconfig()
-    letools.configure(this.config)
-
-    if 'bot' in this.config:
-      if 'key' in this.config['bot']:
+    if 'bot' in self.config:
+      if 'key' in self.config['bot']:
         logger.info("Initializing the bot")
-        this.bot = telepot.Bot(this.config['bot']['key'])
+        self.bot = telepot.Bot(self.config['bot']['key'])
         if logger.isEnabledFor(logging.DEBUG):
-          botdata = this.bot.getMe()
+          botdata = self.bot.getMe()
           logger.debug("Bot with id %d and name %s connected", botdata['id'], botdata['first_name'])
       else:
         logger.error("Bot configuration not found")
@@ -55,38 +51,33 @@ class Bot(Base):
       logger.error("Bot configuration not found")
       exit(2)
 
-    main()
+    self.bot.message_loop(self.handle)
+    while True:
+      sleep(100000000)
 
-def listcerts(msg):
-  cid = msg['chat']['id']
-  domains = letools.getallcertinfo()
-  output = "Information for {0} domains:\n".format(len(domains))
-  for domain, domaininfo in domains.items():
-    output += "• {0}\n".format(domain)
-    output += "  • Valid until: {0}\n".format(domaininfo.valid_until)
-    if len(domaininfo.alternates) > 1:
-      output += "  • Alternates:\n"
-      for alternate in domaininfo.alternates:
-        output += "    • {}\n".format(alternate.value)
-  this.bot.sendMessage(cid, output)
-  pprint(msg)
-
-
-def nothing(msg):
-  cid = msg['chat']['id']
-  this.bot.sendMessage(cid, 'Please use command interface!')
+  def listcerts(self, msg):
+    cid = msg['chat']['id']
+    domains = letools.getallcertinfo()
+    output = "Information for {0} domains:\n".format(len(domains))
+    for domain, domaininfo in domains.items():
+      output += "• {0}\n".format(domain)
+      output += "   Valid until: {0}\n".format(domaininfo.valid_until)
+      if len(domaininfo.alternates) > 1:
+        output += "   Alternates:\n"
+        for alternate in domaininfo.alternates:
+          output += "   • {}\n".format(alternate.value)
+    self.bot.sendMessage(cid, output)
+    pprint(msg)
 
 
-def handle(msg):
-  table = {'listcert': listcerts, None: nothing}
-  router = telepot.helper.Router(telepot.routing.by_chat_command(), table)
-  router.route(msg)
+  def nothing(self, msg):
+    cid = msg['chat']['id']
+    self.bot.sendMessage(cid, 'Please use command interface!')
 
-
-def main():
-  this.bot.message_loop(handle)
-  while True:
-    sleep(100000000)
+  def handle(self, msg):
+    table = {'listcert': self.listcerts, None: self.nothing}
+    router = telepot.helper.Router(telepot.routing.by_chat_command(), table)
+    router.route(msg)
 
 if __name__ == "__main__":
   pass

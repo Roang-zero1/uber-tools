@@ -11,6 +11,7 @@ import os
 logger = logging.getLogger(__name__)
 
 def setup_logging(
+    level=None,
     default_path='logging.json',
     default_level=logging.INFO,
     env_key='LOG_CFG'
@@ -30,9 +31,11 @@ def setup_logging(
   if os.path.exists(path):
     with open(path, 'rt') as settings_file:
       config = json.load(settings_file)
+    if level:
+      config['root']['level'] = level
     logging.config.dictConfig(config)
   else:
-    logging.basicConfig(level=default_level)
+    logging.basicConfig(level=level or default_level)
   logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 def loadconfig(

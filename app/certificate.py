@@ -2,10 +2,14 @@
 uber-tools certificate subcommand
 
 Usage:
-  uber-tools certificate (<domain> | all)
+  uber-tools certificate renew [-f] [--testing | --staging] (all|<domain>)
+  uber-tools certificate info (all|<domain>)
 
 Options:
+  -f --force                        Force certificate renewal.
   -h --help                         Show this screen.
+  --testing                         Receive certificate to memory only.
+  --staging                         Receive certificate from staging server.
   --version                         Show version.
 
 Examples:
@@ -32,30 +36,37 @@ class Certificate(Base):
   """The telegram Bot"""
 
   def execute(self):
-    pass
-    #main()
+    letools.configure(self.config)
+    print(self.config)
 
-def main():
-  logger.info('Iniating certification renewal check')
-  reneweddoms = 0
+    if self.args['renew']:
+      raise NotImplementedError("Renewing {}".format(self.args['<domain>'] or self.args['all']))
+    elif self.args['info']:
+      raise NotImplementedError("Printing information for {}".format(self.args['<domain>'] or self.args['all']))
+    else:
+      raise NotImplementedError("Requested command not implemented")
 
-  domains = letools.getallcertinfo()
 
-  for domain in this.config['domains']:
-    logger.info('Verifying domain %s', domain)
-    renew = False
-    if domain in domains:
-      validtime = domains[domain].valid_until  - datetime.utcnow()
-      if validtime < timedelta(days=this.config['general'].get('limit', 15)):
+    logger.info('Iniating certification renewal check')
+    reneweddoms = 0
+
+    domains = letools.getallcertinfo()
+
+    for domain in self.config['domains']:
+      logger.info('Verifying domain %s', domain)
+      renew = False
+      if domain in domains:
+        validtime = domains[domain].valid_until  - datetime.utcnow()
+        if validtime < timedelta(days=self.config['general'].get('limit', 15)):
+          renew = True
+      else:
         renew = True
-    else:
-      renew = True
 
-    if renew:
-      reneweddoms += 1
-      letools.renewcert(domain)
-    else:
-      logger.debug('Domain %s will not be renewed', domain)
+      if renew:
+        reneweddoms += 1
+        letools.renewcert(domain)
+      else:
+        logger.debug('Domain %s will not be renewed', domain)
 
 if __name__ == "__main__":
   pass

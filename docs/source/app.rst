@@ -1,6 +1,13 @@
 app package
 ===========
 
+Subpackages
+-----------
+
+.. toctree::
+
+    app.tools
+
 Submodules
 ----------
 
@@ -24,6 +31,14 @@ app.certificate module
 ----------------------
 
 .. automodule:: app.certificate
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+app.configure module
+--------------------
+
+.. automodule:: app.configure
     :members:
     :undoc-members:
     :show-inheritance:

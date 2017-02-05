@@ -2,11 +2,12 @@
 """
 uber-tools
 
-Usage: uber-tools [--version] [--help]
+Usage: uber-tools [-v] [--version] [--help]
                   <command> [<args>...]
 
 Options:
   -h --help                         Show this screen.
+  -v --verbose                      Verbose output
   --version                         Show version.
 
 Available uber-tools commands:
@@ -23,6 +24,8 @@ Help:
     https://github.com/Roang-zero1/uber-tools
 """
 
+import logging
+
 from docopt import DocoptExit, docopt
 
 from app import __version__ as VERSION
@@ -33,7 +36,14 @@ def main():
   import app
   args = docopt(__doc__, version=VERSION, options_first=True)
 
-   # Retrieve the command to execute.
+  if args['--verbose']:
+    setup.setup_logging(level=logging.DEBUG)
+  else:
+    setup.setup_logging()
+
+  config = setup.loadconfig()
+
+  # Retrieve the command to execute.
   command_name = args.pop('<command>')
 
   # Retrieve the command arguments.
@@ -41,7 +51,8 @@ def main():
   if command_args is None:
     command_args = {}
 
-  # After 'poping' '<command>' and '<args>', what is left in the args dictionary are the global arguments.
+  # After 'poping' '<command>' and '<args>',
+  # what is left in the args dictionary are the global arguments.
 
   # Retrieve the class from the 'commands' module.
   try:
@@ -51,15 +62,10 @@ def main():
     raise DocoptExit()
 
   # Create an instance of the command.
-  command = command_class(command_name, command_args, args)
+  command = command_class(command_name, config, command_args, args)
 
   # Execute the command.
   command.execute()
 
 if __name__ == "__main__":
-  setup.setup_logging()
-
-  #this.config = tools.setup.loadconfig()
-  #letools.configure(this.config)
-
   main()
