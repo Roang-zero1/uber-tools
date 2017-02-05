@@ -11,7 +11,7 @@ class Base(object):
   A base command.
   """
 
-  def __init__(self, command_args, global_args):
+  def __init__(self, command, command_args, global_args):
     """
     Initialize the command
 
@@ -19,7 +19,7 @@ class Base(object):
       command_args: arguments of the command
       global_args: arguments of the program
     """
-    self.args = docopt(modules[self.__module__].__doc__, argv=command_args or {})
+    self.args = docopt(modules[self.__module__].__doc__, argv=([command] + command_args))
     self.global_args = global_args or {}
 
   def execute(self):

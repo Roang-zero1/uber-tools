@@ -12,24 +12,22 @@ Examples:
   uber-tools bot
 
 Help:
+  The full documentation can be found at:
+    https://roang-zero1.github.io/uber-tools/
   For help using this tool, please open an issue on the Github repository:
-  https://github.com/rdegges/skele-cli
+    https://github.com/Roang-zero1/uber-tools
 """
 import logging
 import sys
 from pprint import pprint
 from time import sleep
 
-from docopt import docopt
-
 import telepot
 import telepot.routing
 
-import tools.le.cert as letools
-import tools.setup
-
-
+import app.tools.cert as letools
 from app.base import Base
+from app.tools import setup
 
 logger = logging.getLogger(__name__)
 this = sys.modules[__name__]
@@ -38,9 +36,9 @@ class Bot(Base):
   """The telegram Bot"""
 
   def execute(self):
-    tools.setup.setup_logging()
+    setup.setup_logging()
 
-    this.config = tools.setup.loadconfig()
+    this.config = setup.loadconfig()
     letools.configure(this.config)
 
     if 'bot' in this.config:
@@ -91,4 +89,4 @@ def main():
     sleep(100000000)
 
 if __name__ == "__main__":
-  docopt(__doc__)
+  pass

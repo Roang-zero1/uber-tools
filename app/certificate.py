@@ -12,17 +12,17 @@ Examples:
   uber-tools certificate
 
 Help:
+  The full documentation can be found at:
+    https://roang-zero1.github.io/uber-tools/
   For help using this tool, please open an issue on the Github repository:
-  https://github.com/rdegges/skele-cli
+    https://github.com/Roang-zero1/uber-tools
 """
 
 import logging
 import sys
 from datetime import datetime, timedelta
 
-import tools.le.cert as letools
-import tools.setup
-
+import app.tools.cert as letools
 from app.base import Base
 
 logger = logging.getLogger(__name__)
@@ -58,9 +58,4 @@ def main():
       logger.debug('Domain %s will not be renewed', domain)
 
 if __name__ == "__main__":
-  tools.setup.setup_logging()
-
-  this.config = tools.setup.loadconfig()
-  letools.configure(this.config)
-
-  main()
+  pass
