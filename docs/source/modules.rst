@@ -4,5 +4,6 @@ uber-tools
 .. toctree::
    :maxdepth: 4
 
-   renew
+   app
+   run
    tools

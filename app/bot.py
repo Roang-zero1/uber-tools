@@ -1,9 +1,26 @@
-#!/usr/bin/env python3
+"""
+uber-tools bot subcommand
 
+Usage:
+  uber-tools bot
+
+Options:
+  -h --help                         Show this screen.
+  --version                         Show version.
+
+Examples:
+  uber-tools bot
+
+Help:
+  For help using this tool, please open an issue on the Github repository:
+  https://github.com/rdegges/skele-cli
+"""
 import logging
 import sys
 from pprint import pprint
 from time import sleep
+
+from docopt import docopt
 
 import telepot
 import telepot.routing
@@ -11,16 +28,16 @@ import telepot.routing
 import tools.le.cert as letools
 import tools.setup
 
-logger = logging.getLogger(__name__)
-this = sys.modules[__name__]
 
 from app.base import Base
 
+logger = logging.getLogger(__name__)
+this = sys.modules[__name__]
 
 class Bot(Base):
   """The telegram Bot"""
 
-  def run(self):
+  def execute(self):
     tools.setup.setup_logging()
 
     this.config = tools.setup.loadconfig()
@@ -74,4 +91,4 @@ def main():
     sleep(100000000)
 
 if __name__ == "__main__":
-  pass
+  docopt(__doc__)

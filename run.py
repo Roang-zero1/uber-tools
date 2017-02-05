@@ -2,15 +2,16 @@
 """
 uber-tools
 
-Usage:
-  uber-tools bot
-  uber-tools certificates
-  uber-tools -h | --help
-  uber-tools --version
+Usage: uber-tools [--version] [--help]
+                  <command> [<args>...]
 
 Options:
   -h --help                         Show this screen.
   --version                         Show version.
+
+Available uber-tools commands:
+  bot
+  certificate
 
 Examples:
   uber-tools bot
@@ -20,27 +21,37 @@ Help:
   https://github.com/rdegges/skele-cli
 """
 
-from inspect import getmembers, isclass
-
-from docopt import docopt
+from docopt import DocoptExit, docopt
 
 from app import __version__ as VERSION
-
 
 def main():
   """Main CLI entrypoint."""
   import app
-  options = docopt(__doc__, version=VERSION)
+  args = docopt(__doc__, version=VERSION, options_first=True)
 
-  # Here we'll try to dynamically match the command the user is trying to run
-  # with a pre-defined command class we've already created.
-  for k, v in options.items():
-    if hasattr(app, k) and v:
-      module = getattr(app, k)
-      commands = getmembers(module, isclass)
-      command = [command[1] for command in commands if command[0] != 'Base'][0]
-      command = command(options)
-      command.run()
+   # Retrieve the command to execute.
+  command_name = args.pop('<command>').capitalize()
+
+  # Retrieve the command arguments.
+  command_args = args.pop('<args>')
+  if command_args is None:
+    command_args = {}
+
+  # After 'poping' '<command>' and '<args>', what is left in the args dictionary are the global arguments.
+
+  # Retrieve the class from the 'commands' module.
+  try:
+    command_class = getattr(app, command_name)
+  except AttributeError:
+    print("Unknown command '{}'.".format(command_name))
+    raise DocoptExit()
+
+  # Create an instance of the command.
+  command = command_class(command_args, args)
+
+  # Execute the command.
+  command.execute()
 
 if __name__ == "__main__":
   #tools.setup.setup_logging()

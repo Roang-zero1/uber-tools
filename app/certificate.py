@@ -1,4 +1,20 @@
-#!/usr/bin/env python3
+"""
+uber-tools certificate subcommand
+
+Usage:
+  uber-tools certificate (<domain> | all)
+
+Options:
+  -h --help                         Show this screen.
+  --version                         Show version.
+
+Examples:
+  uber-tools certificate
+
+Help:
+  For help using this tool, please open an issue on the Github repository:
+  https://github.com/rdegges/skele-cli
+"""
 
 import logging
 import sys
@@ -7,8 +23,17 @@ from datetime import datetime, timedelta
 import tools.le.cert as letools
 import tools.setup
 
+from app.base import Base
+
 logger = logging.getLogger(__name__)
 this = sys.modules[__name__]
+
+class Certificate(Base):
+  """The telegram Bot"""
+
+  def execute(self):
+    pass
+    #main()
 
 def main():
   logger.info('Iniating certification renewal check')
