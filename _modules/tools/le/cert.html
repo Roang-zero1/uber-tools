@@ -60,11 +60,12 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">environ</span><span class="p">,</span> <span class="n">listdir</span><span class="p">,</span> <span class="n">path</span>
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">CalledProcessError</span>
-<span class="kn">from</span> <span class="nn">tools.wrapper.runhelper</span> <span class="k">import</span> <span class="n">runcmd</span>
 
 <span class="kn">from</span> <span class="nn">cryptography</span> <span class="k">import</span> <span class="n">x509</span>
 <span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="k">import</span> <span class="n">default_backend</span>
 <span class="kn">from</span> <span class="nn">cryptography.x509.oid</span> <span class="k">import</span> <span class="n">ExtensionOID</span>
+
+<span class="kn">from</span> <span class="nn">tools.wrapper.runhelper</span> <span class="k">import</span> <span class="n">runcmd</span>
 
 <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
 <span class="n">this</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>

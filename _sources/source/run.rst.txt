@@ -1,7 +1,7 @@
-renew module
-============
+run module
+==========
 
-.. automodule:: renew
+.. automodule:: run
     :members:
     :undoc-members:
     :show-inheritance:

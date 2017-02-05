@@ -49,14 +49,17 @@
             
   <h1>Source code for tools.wrapper.runhelper</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Custom wrapper for the Popen construct</span>
+<span class="sd">Custom wrapper for the :func:`subprocess.Popen` function</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">CalledProcessError</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">PIPE</span><span class="p">,</span> <span class="n">CalledProcessError</span><span class="p">,</span> <span class="n">Popen</span>
 
 <span class="n">CmdOutput</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;CmdOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;out, err, retcode&#39;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The command stdout and stderr buffer content and the returncode.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="runcmd"><a class="viewcode-back" href="../../../source/tools.wrapper.html#tools.wrapper.runhelper.runcmd">[docs]</a><span class="k">def</span> <span class="nf">runcmd</span><span class="p">(</span><span class="o">*</span><span class="n">popenargs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -69,6 +72,13 @@
 
 <span class="sd">  The arguments are the same as for the Popen constructor.</span>
 <span class="sd">  The stdout and stderr argument is not allowed as they are used internally.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    *args: Variable length argument list.</span>
+<span class="sd">    **kwargs: Arbitrary keyword arguments.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    CmdOutput: The output created by the executed command.</span>
 
 <span class="sd">  Example:</span>
 <span class="sd">    &gt;&gt;&gt; runcmd([&quot;ls&quot;, &quot;-l&quot;, &quot;/dev/null&quot;])</span>

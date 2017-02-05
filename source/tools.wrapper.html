@@ -59,28 +59,26 @@
 </div>
 <div class="section" id="module-tools.wrapper.runhelper">
 <span id="tools-wrapper-runhelper-module"></span><h2>tools.wrapper.runhelper module<a class="headerlink" href="#module-tools.wrapper.runhelper" title="Permalink to this headline">¶</a></h2>
-<p>Custom wrapper for the Popen construct</p>
+<p>Custom wrapper for the <code class="xref py py-func docutils literal"><span class="pre">subprocess.Popen()</span></code> function</p>
 <dl class="class">
 <dt id="tools.wrapper.runhelper.CmdOutput">
 <em class="property">class </em><code class="descclassname">tools.wrapper.runhelper.</code><code class="descname">CmdOutput</code><span class="sig-paren">(</span><em>out</em>, <em>err</em>, <em>retcode</em><span class="sig-paren">)</span><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></p>
+<p>The command stdout and stderr buffer content and the returncode.</p>
 <dl class="attribute">
 <dt id="tools.wrapper.runhelper.CmdOutput.err">
 <code class="descname">err</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.err" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="tools.wrapper.runhelper.CmdOutput.out">
 <code class="descname">out</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.out" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 0</p>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="attribute">
 <dt id="tools.wrapper.runhelper.CmdOutput.retcode">
 <code class="descname">retcode</code><a class="headerlink" href="#tools.wrapper.runhelper.CmdOutput.retcode" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -94,6 +92,24 @@ CalledProcessError object will have the return code in the returncode
 attribute and output in the output attribute.</p>
 <p>The arguments are the same as for the Popen constructor.
 The stdout and stderr argument is not allowed as they are used internally.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> &#8211; Variable length argument list.</li>
+<li><strong>**kwargs</strong> &#8211; Arbitrary keyword arguments.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The output created by the executed command.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#tools.wrapper.runhelper.CmdOutput" title="tools.wrapper.runhelper.CmdOutput">CmdOutput</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Example</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">runcmd</span><span class="p">([</span><span class="s2">&quot;ls&quot;</span><span class="p">,</span> <span class="s2">&quot;-l&quot;</span><span class="p">,</span> <span class="s2">&quot;/dev/null&quot;</span><span class="p">])</span>
 </pre></div>
