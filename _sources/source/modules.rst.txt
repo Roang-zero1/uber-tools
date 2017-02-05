@@ -6,4 +6,3 @@ uber-tools
 
    app
    run
-   tools

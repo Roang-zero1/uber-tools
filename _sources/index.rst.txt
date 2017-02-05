@@ -6,6 +6,8 @@
 Welcome to uber-tools's documentation!
 ======================================
 
+Tools for my uberspace hosting accounts
+
 .. toctree::
    :maxdepth: 2
 

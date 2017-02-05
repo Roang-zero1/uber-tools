@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>app.tools.cert &#8212; uber-tools 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">uber-tools 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for app.tools.cert</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Let&#39;s encrypt certiciation tools</span>
+
+<span class="sd">This module provides tools to check and renew certificates on the uberspace hostinprovider.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">R_OK</span><span class="p">,</span> <span class="n">access</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">listdir</span><span class="p">,</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">CalledProcessError</span>
+
+<span class="kn">from</span> <span class="nn">cryptography</span> <span class="k">import</span> <span class="n">x509</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="k">import</span> <span class="n">default_backend</span>
+<span class="kn">from</span> <span class="nn">cryptography.x509.oid</span> <span class="k">import</span> <span class="n">ExtensionOID</span><span class="p">,</span> <span class="n">NameOID</span>
+<span class="kn">from</span> <span class="nn">validators.domain</span> <span class="k">import</span> <span class="n">domain</span> <span class="k">as</span> <span class="n">validate_domain</span>
+
+<span class="kn">from</span> <span class="nn">app.tools.runhelper</span> <span class="k">import</span> <span class="n">runcmd</span>
+
+<span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span>
+<span class="n">this</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">this</span><span class="o">.</span><span class="n">basepath</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CertInfo"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.CertInfo">[docs]</a><span class="k">class</span> <span class="nc">CertInfo</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;CertInfo&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;domain&quot;</span><span class="p">,</span> <span class="s2">&quot;valid_until&quot;</span><span class="p">,</span> <span class="s2">&quot;alternates&quot;</span><span class="p">])):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Information for one Certificate</span>
+
+<span class="sd">  Attributes:</span>
+<span class="sd">    domain: The subject common name for the certificate.</span>
+<span class="sd">    valid_until: Validity time of the certificate.</span>
+<span class="sd">    alternates: Alternate subject names of the certificate.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;   Valid until: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">valid_until</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alternates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+      <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">   Alternates:</span><span class="se">\n</span><span class="s2">&quot;</span>
+      <span class="k">for</span> <span class="n">alternate</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alternates</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;   • </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alternate</span><span class="p">)</span>
+      <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;   • </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alternates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="DomainNotFound"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.DomainNotFound">[docs]</a><span class="k">class</span> <span class="nc">DomainNotFound</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+  <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="InvalidDomain"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.InvalidDomain">[docs]</a><span class="k">class</span> <span class="nc">InvalidDomain</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+  <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="configure"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.configure">[docs]</a><span class="k">def</span> <span class="nf">configure</span><span class="p">(</span><span class="n">configuration</span><span class="p">,</span> <span class="n">staging</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Set configuration for this module</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    configuration: The application configuration to be set for the certificat tools.</span>
+<span class="sd">    staging: Should certificates be requested from the staging environment.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">this</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">configuration</span>
+  <span class="n">this</span><span class="o">.</span><span class="n">staging</span> <span class="o">=</span> <span class="n">staging</span>
+  <span class="n">this</span><span class="o">.</span><span class="n">basepath</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+      <span class="s2">&quot;basepath&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">],</span> <span class="s1">&#39;.config/letsencrypt/live/&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="getcertinfo"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.getcertinfo">[docs]</a><span class="k">def</span> <span class="nf">getcertinfo</span><span class="p">(</span><span class="n">domain</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get the information of the certificate for the domain&quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="n">InvalidDomain</span><span class="p">(</span><span class="s2">&quot;Domain </span><span class="si">{}</span><span class="s2"> not properly formated.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain</span><span class="p">))</span>
+  <span class="k">if</span> <span class="n">access</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;cert.pem&#39;</span><span class="p">),</span> <span class="n">R_OK</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;cert.pem&#39;</span><span class="p">),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+      <span class="n">content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">cert</span> <span class="o">=</span> <span class="n">x509</span><span class="o">.</span><span class="n">load_pem_x509_certificate</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">default_backend</span><span class="p">())</span>
+    <span class="n">common_name</span> <span class="o">=</span> <span class="n">cert</span><span class="o">.</span><span class="n">subject</span><span class="o">.</span><span class="n">get_attributes_for_oid</span><span class="p">(</span><span class="n">NameOID</span><span class="o">.</span><span class="n">COMMON_NAME</span><span class="p">)[</span>
+        <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">alternates</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">alternate</span> <span class="ow">in</span> <span class="n">cert</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_extension_for_oid</span><span class="p">(</span>
+            <span class="n">ExtensionOID</span><span class="o">.</span><span class="n">SUBJECT_ALTERNATIVE_NAME</span><span class="p">)</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+      <span class="n">alternates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alternate</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">CertInfo</span><span class="p">(</span><span class="n">common_name</span><span class="p">,</span> <span class="n">cert</span><span class="o">.</span><span class="n">not_valid_after</span><span class="p">,</span> <span class="n">alternates</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">recurse</span><span class="p">:</span>
+    <span class="n">domains</span> <span class="o">=</span> <span class="n">getallcertinfo</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">domaininfo</span> <span class="ow">in</span> <span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">domaininfo</span><span class="o">.</span><span class="n">alternates</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">domaininfo</span>
+  <span class="k">raise</span> <span class="n">DomainNotFound</span><span class="p">(</span>
+      <span class="s2">&quot;The domain </span><span class="si">{}</span><span class="s2"> certificate was not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="getallcertinfo"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.getallcertinfo">[docs]</a><span class="k">def</span> <span class="nf">getallcertinfo</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Get the information of all certicicates directories below basepath&quot;&quot;&quot;</span>
+  <span class="n">domains</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="n">dirs</span> <span class="o">=</span> <span class="n">listdir</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+    <span class="n">domains</span><span class="p">[</span><span class="n">directory</span><span class="p">]</span> <span class="o">=</span> <span class="n">getcertinfo</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">recurse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">domains</span></div>
+
+
+<div class="viewcode-block" id="renewallcertificates"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.renewallcertificates">[docs]</a><span class="k">def</span> <span class="nf">renewallcertificates</span><span class="p">():</span>
+  <span class="c1"># TODO: Implement certificate renewal for all domains</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Iniating certification renewal check&#39;</span><span class="p">)</span>
+  <span class="n">reneweddoms</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="n">domains</span> <span class="o">=</span> <span class="n">getallcertinfo</span><span class="p">()</span>
+
+  <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">this</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">]:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Verifying domain </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="p">)</span>
+    <span class="n">renew</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">domains</span><span class="p">:</span>
+      <span class="n">validtime</span> <span class="o">=</span> <span class="n">domains</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span><span class="o">.</span><span class="n">valid_until</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+      <span class="k">if</span> <span class="n">validtime</span> <span class="o">&lt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">this</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">)):</span>
+        <span class="n">renew</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">renew</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">renew</span><span class="p">:</span>
+      <span class="n">reneweddoms</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="n">renewcert</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Domain </span><span class="si">%s</span><span class="s1"> will not be renewed&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="renewcert"><a class="viewcode-back" href="../../../source/app.tools.html#app.tools.cert.renewcert">[docs]</a><span class="k">def</span> <span class="nf">renewcert</span><span class="p">(</span><span class="n">domain</span><span class="p">):</span>
+  <span class="c1"># TODO: Reimplement certificate renewal</span>
+  <span class="sd">&quot;&quot;&quot;Renew the certificate for a given domain&quot;&quot;&quot;</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Renewing certificate for domain </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">domain</span><span class="p">)</span>
+  <span class="n">domainc</span> <span class="o">=</span> <span class="n">this</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;domains&#39;</span><span class="p">][</span><span class="n">domain</span><span class="p">]</span>
+
+  <span class="c1"># TODO: Add staging directory</span>
+  <span class="k">if</span> <span class="n">this</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;general&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="n">testing</span> <span class="o">=</span> <span class="s1">&#39;--staging&#39;</span>
+  <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;letsencrypt&#39;</span><span class="p">,</span> <span class="s1">&#39;certonly&#39;</span><span class="p">,</span> <span class="n">testing</span><span class="p">,</span> <span class="s1">&#39;-d </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">domain</span><span class="p">)]</span>
+  <span class="k">if</span> <span class="s1">&#39;alternates&#39;</span> <span class="ow">in</span> <span class="n">domainc</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Renewing for alternate names </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                 <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">domainc</span><span class="p">[</span><span class="s1">&#39;alternates&#39;</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">alternate</span> <span class="ow">in</span> <span class="n">domainc</span><span class="p">[</span><span class="s1">&#39;alternates&#39;</span><span class="p">]:</span>
+      <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; -d </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alternate</span><span class="p">))</span>
+
+  <span class="k">try</span><span class="p">:</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">runcmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Certificate renewal successful&#39;</span><span class="p">)</span>
+  <span class="k">except</span> <span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ex</span><span class="o">.</span><span class="n">output</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Certificate renewal failed.</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">err</span><span class="p">)</span>
+    <span class="k">return</span>
+  <span class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">err</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">err</span><span class="p">)</span>
+
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating a full certificate file&quot;</span><span class="p">)</span>
+  <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;cert.pem&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">certf</span><span class="p">,</span> \
+          <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;privkey.pem&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">keyf</span><span class="p">,</span> \
+          <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;fullchain.pem&#39;</span><span class="p">))</span> <span class="k">as</span> <span class="n">chainf</span><span class="p">,</span> \
+          <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;combined.pem&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fullf</span><span class="p">:</span>
+    <span class="n">cert</span> <span class="o">=</span> <span class="n">certf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">keyf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">chain</span> <span class="o">=</span> <span class="n">chainf</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">fullf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="n">cert</span> <span class="o">+</span> <span class="n">chain</span><span class="p">)</span>
+
+  <span class="c1"># TODO: Skip this in staging</span>
+  <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Add certificate to webserver&quot;</span><span class="p">)</span>
+  <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;uberspace-add-certificate&#39;</span><span class="p">]</span>
+  <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; -k </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;privkey.pem&#39;</span><span class="p">)))</span>
+  <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39; -c </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span class="n">basepath</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="s1">&#39;cert.pem&#39;</span><span class="p">)))</span></div>
+
+  <span class="c1"># TODO: Run additional commands after certificate has been created</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+  <span class="k">pass</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">uber-tools 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Lucas Brandstaetter.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.2.
+    </div>
+  </body>
+</html>

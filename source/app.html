@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="run module" href="run.html" />
+    <link rel="next" title="app.tools package" href="app.tools.html" />
     <link rel="prev" title="uber-tools" href="modules.html" /> 
   </head>
   <body role="document">
@@ -40,7 +40,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="run.html" title="run module"
+          <a href="app.tools.html" title="app.tools package"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="modules.html" title="uber-tools"
@@ -57,6 +57,21 @@
             
   <div class="section" id="app-package">
 <h1>app package<a class="headerlink" href="#app-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="app.tools.html">app.tools package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.tools.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tools.html#module-app.tools.cert">app.tools.cert module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tools.html#module-app.tools.runhelper">app.tools.runhelper module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tools.html#module-app.tools.setup">app.tools.setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tools.html#module-app.tools">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -65,7 +80,7 @@
 <p>The base command.</p>
 <dl class="class">
 <dt id="app.base.Base">
-<em class="property">class </em><code class="descclassname">app.base.</code><code class="descname">Base</code><span class="sig-paren">(</span><em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/base.html#Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.base.Base" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.base.</code><code class="descname">Base</code><span class="sig-paren">(</span><em>command</em>, <em>config</em>, <em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/base.html#Base"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.base.Base" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>A base command.</p>
 <dl class="method">
@@ -91,40 +106,45 @@
 <p>uber-tools bot</p>
 <dl class="docutils">
 <dt>Help:</dt>
-<dd>For help using this tool, please open an issue on the Github repository:
-<a class="reference external" href="https://github.com/rdegges/skele-cli">https://github.com/rdegges/skele-cli</a></dd>
+<dd><dl class="first last docutils">
+<dt>The full documentation can be found at:</dt>
+<dd><a class="reference external" href="https://roang-zero1.github.io/uber-tools/">https://roang-zero1.github.io/uber-tools/</a></dd>
+<dt>For help using this tool, please open an issue on the Github repository:</dt>
+<dd><a class="reference external" href="https://github.com/Roang-zero1/uber-tools">https://github.com/Roang-zero1/uber-tools</a></dd>
+</dl>
+</dd>
 </dl>
 <dl class="class">
 <dt id="app.bot.Bot">
-<em class="property">class </em><code class="descclassname">app.bot.</code><code class="descname">Bot</code><span class="sig-paren">(</span><em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.bot.</code><code class="descname">Bot</code><span class="sig-paren">(</span><em>command</em>, <em>config</em>, <em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#app.base.Base" title="app.base.Base"><code class="xref py py-class docutils literal"><span class="pre">app.base.Base</span></code></a></p>
 <p>The telegram Bot</p>
+<dl class="attribute">
+<dt id="app.bot.Bot.bot">
+<code class="descname">bot</code><em class="property"> = None</em><a class="headerlink" href="#app.bot.Bot.bot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="app.bot.Bot.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot.execute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="method">
+<dt id="app.bot.Bot.handle">
+<code class="descname">handle</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot.handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot.handle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.bot.Bot.listcerts">
+<code class="descname">listcerts</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot.listcerts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot.listcerts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.bot.Bot.nothing">
+<code class="descname">nothing</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#Bot.nothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.Bot.nothing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
-
-<dl class="function">
-<dt id="app.bot.handle">
-<code class="descclassname">app.bot.</code><code class="descname">handle</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#handle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.handle" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="app.bot.listcerts">
-<code class="descclassname">app.bot.</code><code class="descname">listcerts</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#listcerts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.listcerts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="app.bot.main">
-<code class="descclassname">app.bot.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.main" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="app.bot.nothing">
-<code class="descclassname">app.bot.</code><code class="descname">nothing</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/bot.html#nothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.bot.nothing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-app.certificate">
@@ -132,21 +152,29 @@
 <p>uber-tools certificate subcommand</p>
 <dl class="docutils">
 <dt>Usage:</dt>
-<dd>uber-tools certificate (&lt;domain&gt; | all)</dd>
+<dd>uber-tools certificate renew [-f] [&#8211;staging] (all|&lt;domain&gt;...)
+uber-tools certificate info (all|&lt;domain&gt;...)</dd>
 <dt>Options:</dt>
-<dd>-h &#8211;help                         Show this screen.
+<dd>-f &#8211;force                        Force certificate renewal.
+-h &#8211;help                         Show this screen.
+&#8211;staging                         Receive certificate from staging server.
 &#8211;version                         Show version.</dd>
 </dl>
 <p class="rubric">Examples</p>
 <p>uber-tools certificate</p>
 <dl class="docutils">
 <dt>Help:</dt>
-<dd>For help using this tool, please open an issue on the Github repository:
-<a class="reference external" href="https://github.com/rdegges/skele-cli">https://github.com/rdegges/skele-cli</a></dd>
+<dd><dl class="first last docutils">
+<dt>The full documentation can be found at:</dt>
+<dd><a class="reference external" href="https://roang-zero1.github.io/uber-tools/">https://roang-zero1.github.io/uber-tools/</a></dd>
+<dt>For help using this tool, please open an issue on the Github repository:</dt>
+<dd><a class="reference external" href="https://github.com/Roang-zero1/uber-tools">https://github.com/Roang-zero1/uber-tools</a></dd>
+</dl>
+</dd>
 </dl>
 <dl class="class">
 <dt id="app.certificate.Certificate">
-<em class="property">class </em><code class="descclassname">app.certificate.</code><code class="descname">Certificate</code><span class="sig-paren">(</span><em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/certificate.html#Certificate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.certificate.Certificate" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.certificate.</code><code class="descname">Certificate</code><span class="sig-paren">(</span><em>command</em>, <em>config</em>, <em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/certificate.html#Certificate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.certificate.Certificate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#app.base.Base" title="app.base.Base"><code class="xref py py-class docutils literal"><span class="pre">app.base.Base</span></code></a></p>
 <p>The telegram Bot</p>
 <dl class="method">
@@ -156,10 +184,41 @@
 
 </dd></dl>
 
-<dl class="function">
-<dt id="app.certificate.main">
-<code class="descclassname">app.certificate.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/certificate.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.certificate.main" title="Permalink to this definition">¶</a></dt>
+</div>
+<div class="section" id="module-app.configure">
+<span id="app-configure-module"></span><h2>app.configure module<a class="headerlink" href="#module-app.configure" title="Permalink to this headline">¶</a></h2>
+<p>uber-tools configure</p>
+<dl class="docutils">
+<dt>Usage:</dt>
+<dd>uber-tools configure
+uber-tools configure bot
+uber-tools configure certificate</dd>
+<dt>Options:</dt>
+<dd>-h &#8211;help                         Show this screen.
+&#8211;version                         Show version.</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>uber-tools bot</p>
+<dl class="docutils">
+<dt>Help:</dt>
+<dd><dl class="first last docutils">
+<dt>The full documentation can be found at:</dt>
+<dd><a class="reference external" href="https://roang-zero1.github.io/uber-tools/">https://roang-zero1.github.io/uber-tools/</a></dd>
+<dt>For help using this tool, please open an issue on the Github repository:</dt>
+<dd><a class="reference external" href="https://github.com/Roang-zero1/uber-tools">https://github.com/Roang-zero1/uber-tools</a></dd>
+</dl>
+</dd>
+</dl>
+<dl class="class">
+<dt id="app.configure.Configure">
+<em class="property">class </em><code class="descclassname">app.configure.</code><code class="descname">Configure</code><span class="sig-paren">(</span><em>command</em>, <em>config</em>, <em>command_args</em>, <em>global_args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/configure.html#Configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.configure.Configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#app.base.Base" title="app.base.Base"><code class="xref py py-class docutils literal"><span class="pre">app.base.Base</span></code></a></p>
+<dl class="method">
+<dt id="app.configure.Configure.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/app/configure.html#Configure.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#app.configure.Configure.execute" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="module-app">
@@ -176,10 +235,12 @@
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">app package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-app.base">app.base module</a></li>
 <li><a class="reference internal" href="#module-app.bot">app.bot module</a></li>
 <li><a class="reference internal" href="#module-app.certificate">app.certificate module</a></li>
+<li><a class="reference internal" href="#module-app.configure">app.configure module</a></li>
 <li><a class="reference internal" href="#module-app">Module contents</a></li>
 </ul>
 </li>
@@ -189,8 +250,8 @@
   <p class="topless"><a href="modules.html"
                         title="previous chapter">uber-tools</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="run.html"
-                        title="next chapter">run module</a></p>
+  <p class="topless"><a href="app.tools.html"
+                        title="next chapter">app.tools package</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -222,7 +283,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="run.html" title="run module"
+          <a href="app.tools.html" title="app.tools package"
              >next</a> |</li>
         <li class="right" >
           <a href="modules.html" title="uber-tools"
