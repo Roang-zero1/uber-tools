@@ -12,6 +12,7 @@ The command stdout and stderr buffer content and the returncode.
 """
 logger = logging.getLogger(__name__)
 
+
 def runcmd(*popenargs, **kwargs):
   r"""Run command with arguments and return the std_out, std,err and
   returncode as a namedtuple.

@@ -29,6 +29,7 @@ from app.base import Base
 
 logger = logging.getLogger(__name__)
 
+
 class Bot(Base):
   """The telegram Bot"""
 
@@ -43,7 +44,8 @@ class Bot(Base):
         self.bot = telepot.Bot(self.config['bot']['key'])
         if logger.isEnabledFor(logging.DEBUG):
           botdata = self.bot.getMe()
-          logger.debug("Bot with id %d and name %s connected", botdata['id'], botdata['first_name'])
+          logger.debug("Bot with id %d and name %s connected",
+                       botdata['id'], botdata['first_name'])
       else:
         logger.error("Bot configuration not found")
         exit(2)
@@ -59,16 +61,10 @@ class Bot(Base):
     cid = msg['chat']['id']
     domains = letools.getallcertinfo()
     output = "Information for {0} domains:\n".format(len(domains))
-    for domain, domaininfo in domains.items():
-      output += "• {0}\n".format(domain)
-      output += "   Valid until: {0}\n".format(domaininfo.valid_until)
-      if len(domaininfo.alternates) > 1:
-        output += "   Alternates:\n"
-        for alternate in domaininfo.alternates:
-          output += "   • {}\n".format(alternate.value)
+    for domaininfo in domains.values():
+      output += "• {}".format(str(domaininfo))
     self.bot.sendMessage(cid, output)
     pprint(msg)
-
 
   def nothing(self, msg):
     cid = msg['chat']['id']

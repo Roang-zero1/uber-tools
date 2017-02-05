@@ -27,9 +27,12 @@ from app.base import Base
 logger = logging.getLogger(__name__)
 this = sys.modules[__name__]
 
+
 class Configure(Base):
+
   def execute(self):
     print(self.args)
+    raise NotImplementedError("Configure manually")
 
 if __name__ == "__main__":
   pass

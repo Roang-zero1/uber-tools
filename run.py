@@ -23,13 +23,13 @@ Help:
   For help using this tool, please open an issue on the Github repository:
     https://github.com/Roang-zero1/uber-tools
 """
-
 import logging
 
 from docopt import DocoptExit, docopt
 
 from app import __version__ as VERSION
 from app.tools import setup
+
 
 def main():
   """Main CLI entrypoint."""

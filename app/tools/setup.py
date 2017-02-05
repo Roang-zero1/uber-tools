@@ -10,6 +10,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
+
 def setup_logging(
     level=None,
     default_path='logging.json',
@@ -37,6 +38,7 @@ def setup_logging(
   else:
     logging.basicConfig(level=level or default_level)
   logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 def loadconfig(
     default_path='config.json',

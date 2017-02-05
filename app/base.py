@@ -2,9 +2,10 @@
 """
 The base command.
 """
-
 from sys import modules
+
 from docopt import docopt
+
 
 class Base(object):
   """
@@ -22,7 +23,8 @@ class Base(object):
       global_args: arguments of the program
     """
     self.config = config
-    self.args = docopt(modules[self.__module__].__doc__, argv=([command] + command_args))
+    self.args = docopt(modules[self.__module__].__doc__,
+                       argv=([command] + command_args))
     self.global_args = global_args or {}
 
   def execute(self):
